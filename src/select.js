@@ -455,15 +455,24 @@
 
     // Closes the dropdown
     ctrl.close = function(skipFocusser) {
-      if (!ctrl.open) return;
+      if (!ctrl.open) {
+        return;
+      }
+
       _resetSearchInput();
       ctrl.open = false;
+
       if (!ctrl.multiple){
         $timeout(function(){
           ctrl.focusser.prop('disabled', false);
           if (!skipFocusser) ctrl.focusser[0].focus();
         },0,false);
       }
+
+      // Give some time for scope propagation.
+      $timeout(function(){
+        ctrl.onCloseCallback($scope);
+      });
     };
 
     // Toggle dropdown
@@ -921,6 +930,7 @@
 
         $select.onSelectCallback = $parse(attrs.onSelect);
         $select.onRemoveCallback = $parse(attrs.onRemove);
+        $select.onCloseCallback = $parse(attrs.onClose);
 
         //From view --> model
         ngModel.$parsers.unshift(function (inputValue) {
